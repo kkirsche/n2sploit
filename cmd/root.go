@@ -78,6 +78,7 @@ exploits related to the service`,
 				qs = append(qs, q)
 			}
 
+			logrus.Debugln("[+] deduplicating queries...")
 			for _, q := range libn2sploit.RemoveDuplicates(qs) {
 				logrus.Infof("[*] executing \"searchsploit %s\"...", q)
 				out, err := exec.Command("searchsploit", q).Output()
