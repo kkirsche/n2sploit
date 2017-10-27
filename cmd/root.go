@@ -26,6 +26,7 @@ import (
 )
 
 var (
+	v     bool
 	fuzzy bool
 	so    bool
 )
@@ -38,7 +39,20 @@ var RootCmd = &cobra.Command{
 exploits related to the service`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		logrus.WithFields(logrus.Fields{
+			"fuzzy":       fuzzy,
+			"serviceOnly": so,
+			"verbose":     v,
+		}).Debugln("[+] initializing...")
+		if v {
+			logrus.SetLevel(logrus.DebugLevel)
+		} else {
+			logrus.SetLevel(logrus.InfoLevel)
+		}
+
 		for _, arg := range args {
+			logrus.Debugf("[+] parsing file %s...", arg)
+
 			n, err := libnmap.Parse(arg)
 			if err != nil {
 				continue
@@ -48,6 +62,8 @@ exploits related to the service`,
 				var q string
 
 				if so {
+					q = port.Service.AttrProduct
+				} else {
 					version := port.Service.AttrVersion
 					if fuzzy {
 						s := strings.Split(port.Service.AttrVersion, ".")
@@ -55,17 +71,16 @@ exploits related to the service`,
 						version = strings.Join(vl, ".")
 					}
 					q = fmt.Sprintf("%s %s", port.Service.AttrProduct, version)
-				} else {
-					q = port.Service.AttrProduct
 				}
+
 				qs = append(qs, q)
 			}
 
 			for _, q := range qs {
-				logrus.Infof("Executing \"searchsploit %s\"...", q)
+				logrus.Infof("[*] executing \"searchsploit %s\"...", q)
 				out, err := exec.Command("searchsploit", q).Output()
 				if err != nil {
-					logrus.WithError(err).Errorln("Failed to search...")
+					logrus.WithError(err).Errorln("[!] failed to search...")
 				}
 
 				logrus.Println(string(out))
@@ -84,6 +99,7 @@ func Execute() {
 }
 
 func init() {
+	RootCmd.Flags().BoolVarP(&v, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.Flags().BoolVarP(&so, "service-only", "s", false, "Only search for service name")
 	RootCmd.Flags().BoolVarP(&fuzzy, "fuzzy-version", "f", false, "Fuzzy version searching")
 }
