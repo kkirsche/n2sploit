@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/kkirsche/nmap-searchsploit/cmd"
+import "github.com/kkirsche/n2sploit/cmd"
 
 func main() {
 	cmd.Execute()

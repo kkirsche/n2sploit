@@ -20,7 +20,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/kkirsche/nmap-searchsploit/libnmap"
+	"github.com/kkirsche/n2sploit/libnmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +31,7 @@ var (
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "nmap-searchsploit",
+	Use:   "n2sploit",
 	Short: "Used to take Nmap data and search Exploit-DB via SearchSploit",
 	Long: `Used to take Nmap data and search Exploit-DB via SearchSploit for
 exploits related to the service`,
