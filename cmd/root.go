@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -40,30 +39,14 @@ exploits related to the service`,
 			}
 			for _, port := range n.Host.Ports.Port {
 				q := fmt.Sprintf("%s %s", port.Service.AttrProduct, port.Service.AttrVersion)
-				cmd := exec.Command("searchsploit", q)
-				stdout, err := cmd.StdoutPipe()
+
+				logrus.Infof("Searching searchsploit for \"%s\"...", q)
+				out, err := exec.Command("searchsploit", q).Output()
 				if err != nil {
-					logrus.WithError(err).Errorln("Failed to open stdout")
-					continue
+					logrus.WithError(err).Errorln("Failed to search...")
 				}
 
-				logrus.Infof("Searching searchsploit for %s...", q)
-				err = cmd.Start()
-				if err != nil {
-					logrus.WithError(err).Errorln("Command failed")
-					continue
-				}
-
-				buf := new(bytes.Buffer)
-				buf.ReadFrom(stdout)
-
-				err = cmd.Wait()
-				if err != nil {
-					logrus.WithError(err).Errorln("Failed waiting for command")
-					continue
-				}
-
-				logrus.Println(buf.String())
+				logrus.Println(string(out))
 			}
 		}
 	},
