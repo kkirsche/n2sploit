@@ -20,6 +20,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/kkirsche/n2sploit/libn2sploit"
 	"github.com/kkirsche/n2sploit/libnmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -77,7 +78,7 @@ exploits related to the service`,
 				qs = append(qs, q)
 			}
 
-			for _, q := range qs {
+			for _, q := range libn2sploit.RemoveDuplicates(qs) {
 				logrus.Infof("[*] executing \"searchsploit %s\"...", q)
 				out, err := exec.Command("searchsploit", q).Output()
 				if err != nil {
