@@ -18,10 +18,15 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/kkirsche/nmap-searchsploit/libnmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+)
+
+var (
+	fuzzy bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -38,7 +43,13 @@ exploits related to the service`,
 				continue
 			}
 			for _, port := range n.Host.Ports.Port {
-				q := fmt.Sprintf("%s %s", port.Service.AttrProduct, port.Service.AttrVersion)
+				version := port.Service.AttrVersion
+				if fuzzy {
+					s := strings.Split(port.Service.AttrVersion, ".")
+					vl := s[:1]
+					version = strings.Join(vl, ".")
+				}
+				q := fmt.Sprintf("%s %s", port.Service.AttrProduct, version)
 
 				logrus.Infof("Searching searchsploit for \"%s\"...", q)
 				out, err := exec.Command("searchsploit", q).Output()
@@ -61,4 +72,6 @@ func Execute() {
 	}
 }
 
-func init() {}
+func init() {
+	RootCmd.Flags().BoolVarP(&fuzzy, "fuzzy", "f", false, "Fuzzy version searching")
+}
