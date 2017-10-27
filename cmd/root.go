@@ -46,7 +46,7 @@ exploits related to the service`,
 				version := port.Service.AttrVersion
 				if fuzzy {
 					s := strings.Split(port.Service.AttrVersion, ".")
-					vl := s[:1]
+					vl := s[:2]
 					version = strings.Join(vl, ".")
 				}
 				q := fmt.Sprintf("%s %s", port.Service.AttrProduct, version)
