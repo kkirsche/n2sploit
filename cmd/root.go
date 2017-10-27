@@ -39,16 +39,17 @@ var RootCmd = &cobra.Command{
 exploits related to the service`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logrus.WithFields(logrus.Fields{
-			"fuzzy":       fuzzy,
-			"serviceOnly": so,
-			"verbose":     v,
-		}).Debugln("[+] initializing...")
 		if v {
 			logrus.SetLevel(logrus.DebugLevel)
 		} else {
 			logrus.SetLevel(logrus.InfoLevel)
 		}
+
+		logrus.WithFields(logrus.Fields{
+			"fuzzy":       fuzzy,
+			"serviceOnly": so,
+			"verbose":     v,
+		}).Debugln("[+] initializing...")
 
 		for _, arg := range args {
 			logrus.Debugf("[+] parsing file %s...", arg)

@@ -14,13 +14,13 @@ func Parse(fp string) (Nmaprun, error) {
 
 	data, err := ioutil.ReadFile(fp)
 	if err != nil {
-		logrus.WithError(err).Errorln(fmt.Sprintf("Failed to open file at path %s", fp))
+		logrus.WithError(err).Errorln(fmt.Sprintf("[!] failed to open file at path %s", fp))
 		return result, err
 	}
 
 	err = xml.Unmarshal(data, &result)
 	if err != nil {
-		logrus.WithError(err).Errorln("Failed to parse Nmap XML")
+		logrus.WithError(err).Errorln("[!] failed to parse Nmap XML")
 		return result, err
 	}
 	return result, nil
