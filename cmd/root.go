@@ -27,6 +27,7 @@ import (
 
 var (
 	fuzzy bool
+	so    bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -42,16 +43,26 @@ exploits related to the service`,
 			if err != nil {
 				continue
 			}
+			qs := []string{}
 			for _, port := range n.Host.Ports.Port {
-				version := port.Service.AttrVersion
-				if fuzzy {
-					s := strings.Split(port.Service.AttrVersion, ".")
-					vl := s[:2]
-					version = strings.Join(vl, ".")
-				}
-				q := fmt.Sprintf("%s %s", port.Service.AttrProduct, version)
+				var q string
 
-				logrus.Infof("Searching searchsploit for \"%s\"...", q)
+				if so {
+					version := port.Service.AttrVersion
+					if fuzzy {
+						s := strings.Split(port.Service.AttrVersion, ".")
+						vl := s[:2]
+						version = strings.Join(vl, ".")
+					}
+					q = fmt.Sprintf("%s %s", port.Service.AttrProduct, version)
+				} else {
+					q = port.Service.AttrProduct
+				}
+				qs = append(qs, q)
+			}
+
+			for _, q := range qs {
+				logrus.Infof("Executing \"searchsploit %s\"...", q)
 				out, err := exec.Command("searchsploit", q).Output()
 				if err != nil {
 					logrus.WithError(err).Errorln("Failed to search...")
@@ -73,5 +84,6 @@ func Execute() {
 }
 
 func init() {
-	RootCmd.Flags().BoolVarP(&fuzzy, "fuzzy", "f", false, "Fuzzy version searching")
+	RootCmd.Flags().BoolVarP(&so, "service-only", "s", false, "Only search for service name")
+	RootCmd.Flags().BoolVarP(&fuzzy, "fuzzy-version", "f", false, "Fuzzy version searching")
 }
